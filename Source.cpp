@@ -2,6 +2,16 @@
 #include <string>
 #include <vector>
 
+////***********GLOBAL VALUES
+
+namespace characterLimitation
+{
+    const uint32_t MAX_ABILITY_VALUE = 1000;
+};
+
+
+//*********** OUTPUTTER
+
 class Outputter
 {
 public:
@@ -16,7 +26,10 @@ class consoleOutput : public Outputter
 void consoleOutput::output(std::string)
 {
 }
+//*********** OUTPUTTER_END
 
+
+//*********** LOGGER
 class Logger
 {
 private:
@@ -66,12 +79,9 @@ Logger* Logger::getLogger ( )
     }
     return logger;
 }
+//*********** LOGGER_END
 
-namespace characterLimitation
-{
-    const uint32_t MAX_ABILITY_VALUE = 1000;
-};
-
+//*********** ABILITY
 class Ability
 {
 private:
@@ -83,6 +93,34 @@ public:
     void improve ( uint32_t );
     virtual uint32_t getValue ( );
 };
+
+Ability::Ability ( uint32_t value, const uint32_t _limit = characterLimitation::MAX_ABILITY_VALUE ) : currentValue ( value ), limit ( _limit )
+{
+    if (currentValue > limit/2)
+    {
+        Logger *log = Logger::getLogger ( );
+        log->addRecord ( " wrong initialization " );
+
+        currentValue = limit;
+    }
+};
+
+void Ability::improve ( uint32_t value )
+{
+    currentValue += value;
+    if (limit < currentValue)
+    {
+        currentValue = limit;
+    }
+}
+
+uint32_t Ability::getValue( )
+{
+    return currentValue;
+}
+//*********** ABILITY_END
+
+//*********** CAPABILITY
 
 class Capability
 {
@@ -134,34 +172,7 @@ uint32_t Capability::getValue()
 {
     return currentValue;
 }
-
-Ability::Ability ( uint32_t value, const uint32_t _limit = characterLimitation::MAX_ABILITY_VALUE ) : currentValue ( value ), limit ( _limit )
-{
-    if (currentValue > limit/2)
-    {
-        Logger *log = Logger::getLogger ( );
-        log->addRecord ( " wrong initialization " );
-
-        currentValue = limit;
-    }
-};
-
-void Ability::improve ( uint32_t value )
-{
-    currentValue += value;
-    if (limit < currentValue)
-    {
-        currentValue = limit;
-    }
-}
-
-uint32_t Ability::getValue( )
-{
-    return currentValue;
-}
-
-
-
+//*********** CAPABILITY_END
 int main ( )
 {
     return 0;
