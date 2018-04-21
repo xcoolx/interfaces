@@ -8,24 +8,55 @@ public:
     virtual void output ( std::string ) = 0;
 };
 
+class consoleOutput : public Outputter
+{
+    void output(std::string);
+};
+
+void consoleOutput::output(std::string)
+{
+}
+
 class Logger
 {
 private:
     static Outputter* outputter;
     static Logger* logger;
-    Logger ( );
+    Logger ();
     ~Logger ( );
 public:
+    static void setOutputter(Outputter*);
     static Logger* getLogger ( );
     static void addRecord ( std::string record );
 };
 
+Logger::Logger()
+{
+}
+
+Logger::~Logger()
+{
+}
+
+void Logger::setOutputter(Outputter* _outputter)
+{
+    outputter = _outputter;
+}
+
 void Logger::addRecord ( std::string record )
 {
-    outputter->output(record);
+    if (nullptr == outputter)
+    {
+        throw "critical issue";
+    }
+    else
+    {
+        outputter->output(record);
+    }
 }
 
 Logger * Logger::logger = nullptr;
+Outputter * Logger::outputter = nullptr;
 
 Logger* Logger::getLogger ( )
 {
