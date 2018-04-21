@@ -12,31 +12,20 @@ class Logger
 {
 private:
     static Outputter* outputter;
-    static std::vector<std::string> storage;
     static Logger* logger;
     Logger ( );
     ~Logger ( );
 public:
     static Logger* getLogger ( );
     static void addRecord ( std::string record );
-    static void output ( );
 };
 
 void Logger::addRecord ( std::string record )
 {
-    storage.push_back ( record );
+    outputter->output(record);
 }
 
 Logger * Logger::logger = nullptr;
-
-void Logger::output ( )
-{
-    std::vector<std::string>::iterator it;
-    for (it = storage.begin ( ); it != storage.end ( ); it++)
-    {
-        outputter->output( *it );
-    }
-}
 
 Logger* Logger::getLogger ( )
 {
@@ -45,14 +34,6 @@ Logger* Logger::getLogger ( )
         logger = new Logger;
     }
     return logger;
-}
-
-Logger::~Logger ( )
-{
-    if (nullptr != logger)
-    {
-        delete logger;
-    }
 }
 
 namespace characterLimitation
@@ -66,17 +47,62 @@ private:
     uint32_t currentValue;
     const uint32_t limit;
 public:
-    explicit Ability ( uint32_t, const uint32_t limit );
+    explicit Ability ( uint32_t, const uint32_t );
     Ability ( ) = delete;
     void improve ( uint32_t );
-    uint32_t getValue ( );
+    virtual uint32_t getValue ( );
 };
 
 class Capability
 {
 private:
-
+    uint32_t currentValue;
+    Ability *ability;
+public:
+    explicit Capability(Ability *);
+    Capability() = delete;
+    void update();
+    void spend(uint32_t);
+    uint32_t getValue();
 };
+
+Capability::Capability(Ability *_ability)
+{
+    if (nullptr == _ability)
+    {
+        Logger *log = Logger::getLogger();
+        log->addRecord(" wrong initialization ");
+        throw "critical issue";
+    }
+    else
+    {
+        ability = _ability;
+    }
+    //place to register observer to send event in case of currentValue == 0
+};
+
+void Capability::update()
+{
+    currentValue = ability->getValue();
+}
+
+void Capability::spend(uint32_t value)
+{
+    if (currentValue <= value)
+    {
+        currentValue = 0;
+        //place for observer notification
+    }
+    else
+    {
+        currentValue -= value;
+    }
+}
+
+uint32_t Capability::getValue()
+{
+    return currentValue;
+}
 
 Ability::Ability ( uint32_t value, const uint32_t _limit = characterLimitation::MAX_ABILITY_VALUE ) : currentValue ( value ), limit ( _limit )
 {
@@ -98,7 +124,7 @@ void Ability::improve ( uint32_t value )
     }
 }
 
-uint32_t Ability::getValue ( )
+uint32_t Ability::getValue( )
 {
     return currentValue;
 }
