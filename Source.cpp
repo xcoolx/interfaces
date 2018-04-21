@@ -1,6 +1,7 @@
 ﻿#include <stdint.h>
 #include <string>
 #include <vector>
+#include <iostream>
 
 ////***********GLOBAL VALUES
 
@@ -11,7 +12,7 @@ namespace characterLimitation
 
 
 //*********** OUTPUTTER
-
+//*********** todo:
 class Outputter
 {
 public:
@@ -23,13 +24,16 @@ class consoleOutput : public Outputter
     void output(std::string);
 };
 
-void consoleOutput::output(std::string)
+void consoleOutput::output(std::string log)
 {
+    std::cout << log << std::endl;
 }
 //*********** OUTPUTTER_END
 
 
 //*********** LOGGER
+//*********** todo:
+//*********** 1. Logger should have filename, line, and some parameters
 class Logger
 {
 private:
@@ -121,6 +125,9 @@ uint32_t Ability::getValue( )
 //*********** ABILITY_END
 
 //*********** CAPABILITY
+//*********** todo:
+//*********** 1. place to register observer to send event in case of currentValue == 0
+//*********** 2. place for observer notification
 
 class Capability
 {
