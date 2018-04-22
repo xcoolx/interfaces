@@ -3,7 +3,10 @@
 #include <vector>
 #include <iostream>
 
-////***********GLOBAL VALUES
+//*********** TODO:
+//*********** 1. implement error handling
+
+//*********** GLOBAL VALUES
 
 namespace characterLimitation
 {
@@ -16,15 +19,15 @@ namespace characterLimitation
 class Outputter
 {
 public:
-    virtual void output ( std::string ) = 0;
+    virtual void output ( const std::string& ) = 0;
 };
 
 class consoleOutput : public Outputter
 {
-    void output(std::string);
+    void output( const std::string& );
 };
 
-void consoleOutput::output(std::string log)
+void consoleOutput::output(const std::string& log)
 {
     std::cout << log << std::endl;
 }
@@ -37,14 +40,14 @@ void consoleOutput::output(std::string log)
 class Logger
 {
 private:
-    static Outputter* outputter;
-    static Logger* logger;
+    static Outputter* loggerOutputter;
+    static Logger* singlton_logger;
     Logger ();
-    ~Logger ( );
+    ~Logger ();
 public:
     static void setOutputter(Outputter*);
-    static Logger* getLogger ( );
-    static void addRecord ( std::string record );
+    static const Logger* getLogger ( );
+    static void addRecord ( const std::string& record );
 };
 
 Logger::Logger()
@@ -57,31 +60,31 @@ Logger::~Logger()
 
 void Logger::setOutputter(Outputter* _outputter)
 {
-    outputter = _outputter;
+    loggerOutputter = _outputter;
 }
 
-void Logger::addRecord ( std::string record )
+void Logger::addRecord (const std::string& record)
 {
-    if (nullptr == outputter)
+    if (nullptr == loggerOutputter)
     {
         throw "critical issue";
     }
     else
     {
-        outputter->output(record);
+        loggerOutputter->output(record);
     }
 }
 
-Logger * Logger::logger = nullptr;
-Outputter * Logger::outputter = nullptr;
+Logger * Logger::singlton_logger = nullptr;
+Outputter * Logger::loggerOutputter = nullptr;
 
-Logger* Logger::getLogger ( )
+const Logger* Logger::getLogger ( )
 {
-    if (nullptr == logger)
+    if (nullptr == singlton_logger)
     {
-        logger = new Logger;
+        singlton_logger = new Logger;
     }
-    return logger;
+    return singlton_logger;
 }
 //*********** LOGGER_END
 
@@ -92,18 +95,17 @@ private:
     uint32_t currentValue;
     const uint32_t limit;
 public:
-    explicit Ability ( uint32_t, const uint32_t );
+    explicit Ability ( const uint32_t, const uint32_t );
     Ability ( ) = delete;
-    void improve ( uint32_t );
-    virtual uint32_t getValue ( );
+    void improve ( const uint32_t );
+    const uint32_t getValue ( )const;
 };
 
 Ability::Ability ( uint32_t value, const uint32_t _limit = characterLimitation::MAX_ABILITY_VALUE ) : currentValue ( value ), limit ( _limit )
 {
     if (currentValue > limit/2)
     {
-        Logger *log = Logger::getLogger ( );
-        log->addRecord ( " wrong initialization " );
+        Logger::getLogger()->addRecord ( " wrong initialization " );
 
         currentValue = limit;
     }
@@ -118,7 +120,7 @@ void Ability::improve ( uint32_t value )
     }
 }
 
-uint32_t Ability::getValue( )
+const uint32_t Ability::getValue( )const
 {
     return currentValue;
 }
@@ -133,33 +135,23 @@ class Capability
 {
 private:
     uint32_t currentValue;
-    Ability *ability;
+    const Ability& ability;
 public:
-    explicit Capability(Ability *);
+    explicit Capability(const Ability&);
     Capability() = delete;
     void update();
-    void spend(uint32_t);
-    uint32_t getValue();
+    void spend(const uint32_t);
+    const uint32_t getValue()const;
 };
 
-Capability::Capability(Ability *_ability)
+Capability::Capability(const Ability& _ability):ability(_ability)
 {
-    if (nullptr == _ability)
-    {
-        Logger *log = Logger::getLogger();
-        log->addRecord(" wrong initialization ");
-        throw "critical issue";
-    }
-    else
-    {
-        ability = _ability;
-    }
     //place to register observer to send event in case of currentValue == 0
 };
 
 void Capability::update()
 {
-    currentValue = ability->getValue();
+    currentValue = ability.getValue();
 }
 
 void Capability::spend(uint32_t value)
@@ -175,7 +167,7 @@ void Capability::spend(uint32_t value)
     }
 }
 
-uint32_t Capability::getValue()
+const uint32_t Capability::getValue()const
 {
     return currentValue;
 }
