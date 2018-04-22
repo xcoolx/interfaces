@@ -98,7 +98,7 @@ public:
     explicit Ability ( const uint32_t, const uint32_t );
     Ability ( ) = delete;
     void improve ( const uint32_t );
-    const uint32_t getValue ( )const;
+    uint32_t getValue ( )const;
 };
 
 Ability::Ability ( uint32_t value, const uint32_t _limit = characterLimitation::MAX_ABILITY_VALUE ) : currentValue ( value ), limit ( _limit )
@@ -120,7 +120,7 @@ void Ability::improve ( uint32_t value )
     }
 }
 
-const uint32_t Ability::getValue( )const
+uint32_t Ability::getValue( )const
 {
     return currentValue;
 }
@@ -141,7 +141,7 @@ public:
     Capability() = delete;
     void update();
     void spend(const uint32_t);
-    const uint32_t getValue()const;
+    uint32_t getValue()const;
 };
 
 Capability::Capability(const Ability& _ability):ability(_ability)
@@ -167,7 +167,7 @@ void Capability::spend(uint32_t value)
     }
 }
 
-const uint32_t Capability::getValue()const
+uint32_t Capability::getValue()const
 {
     return currentValue;
 }
