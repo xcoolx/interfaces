@@ -52,6 +52,7 @@ public:
 
 Logger::Logger()
 {
+    loggerOutputter = new consoleOutput;
 }
 
 Logger::~Logger()

@@ -1,22 +1,5 @@
 #include <stdint.h>
 
-namespace characterLimitation
-{
-    const uint32_t MAX_TRAIT_VALUE = 1000;
-};
-
-class Trait
-{
-private:
-    uint32_t currentValue;
-    const uint32_t limit;
-public:
-    Trait ( uint32_t, const uint32_t limit );
-    void increase ( uint32_t );
-    uint32_t getValue ( );
-};
-
-
 class Vehicle
 {
 private:
@@ -35,21 +18,3 @@ private:
     uint32_t maxEnergy;
     Vehicle *vehicle;
 };
-
-class GraphContent
-{
-    void interface(void);
-private:
-};
-
-class GraphAlgorithm
-{
-public:
-};
-
-
-
-int main ( )
-{
-    return 0;
-}
